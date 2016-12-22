@@ -1,11 +1,18 @@
 #include <stdio.h>
 
-int Create_Player( char *grid ) {
-    grid[10*20] = "/";
-    grid[10*21] = "\\";
-    return 0;
+
+typedef struct Player {
+	int x_pos;
+} Player;
+
+void init_Player(Player *player) {
+	player->x_pos = 25;
 }
 
-int Move_Player() {
-	return 0;
+void spawn_Player(Player *player, char **grid) {
+	grid[24][player->x_pos] = 'M';
+}
+
+void move_Player(Player *player) {
+	
 }
