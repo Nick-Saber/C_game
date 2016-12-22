@@ -1,28 +1,34 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
-int column = 25;
-int row = 50;
+#define ncols 50
+#define nrows 25
 
-int display_Grid(int rows, int columns, char grid[rows][columns]);
+int display_Grid(char ** grid);
 
 int main () 
 {
-	char grid[row][column];
+	//create 2d ncols x nrows grid array and fill it with empty space characters
+	char ** grid = malloc(sizeof(char *)*nrows);
+	for ( int i = 0; i<nrows; i++){
+		grid[i]= (char*) malloc(ncols);
+		memset(grid[i],'@',ncols);
+	}
+	display_Grid(grid);
 
-	display_Grid(row, column, grid);
 
 	return 0;
 }
 
-int display_Grid(int rows, int columns, char grid[rows][columns]) 
+int display_Grid(char ** grid) 
 {
-	for(int i = 0; i <= rows; i++)
+	for(int i = 0; i < nrows; i++)
 	{	
-		for(int j = 0; j <= columns; j++)
+		for(int j = 0; j < ncols; j++)
 		{
-			grid[j][i] = '_';
-			printf("_");
+			printf("%c",grid[i][j]);
 		}
 		printf("\n");
 	}
