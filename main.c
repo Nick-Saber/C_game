@@ -14,11 +14,17 @@ int main ()
 	char ** grid = malloc(sizeof(char *)*nrows);
 	for ( int i = 0; i<nrows; i++){
 		grid[i]= (char*) malloc(ncols);
-		memset(grid[i],'@',ncols);
+		memset(grid[i],' ',ncols);
 	}
+
+	for(;;){
+
+	if(((clock()/CLOCKS_PER_SEC)%1 == 0) || ((clock()/CLOCKS_PER_SEC)%1 == 0.5))
+		{
 	display_Grid(grid);
+		}
 
-
+	}
 	return 0;
 }
 
