@@ -30,7 +30,14 @@ int main ()
 	init_Enemy(&enemy_1);
 	spawn_Enemy(&enemy_1, grid);
 
-	display_Grid(grid);
+	for(;;){
+
+	if(((clock()/CLOCKS_PER_SEC)%1 == 0) || ((clock()/CLOCKS_PER_SEC)%1 == 0.5))
+	{
+		display_Grid(grid);
+	}
+
+	}
 	return 0;
 }
 
