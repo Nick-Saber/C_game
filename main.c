@@ -3,13 +3,9 @@
 #include <string.h>
 #include <ncurses.h>
 #include <curses.h>
-#include <time.h>
 #include "Player.c"
 #include "Enemy.c"
-#include
 
-
-int display_Grid(char ** grid);
 
 int main () 
 {
@@ -40,6 +36,7 @@ int main ()
 	enemy_1.x_pos=max_x/2;
 	enemy_1.y_pos=0;
 	enemy_1.character="V";
+
 
 	//key variable stores current key pressed
 	wchar_t key;

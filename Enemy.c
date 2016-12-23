@@ -3,5 +3,6 @@ typedef struct Enemy {
 	int y_pos;
 	char * character;
 	bullet ** ammo;
+
 } Enemy;
 

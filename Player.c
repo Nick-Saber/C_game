@@ -3,5 +3,6 @@ typedef struct Player {
 	int y_pos;
 	char * character;
 	bullet ** ammo;
+
 } Player;
 
