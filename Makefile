@@ -2,5 +2,5 @@
 
 
 all:
-	gcc -o game main.c
-	./game
+	gcc -o game -lncurses main.c 
+	./game 
