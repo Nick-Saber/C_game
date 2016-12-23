@@ -6,7 +6,3 @@ typedef struct Enemy {
 	char character = '_';
 } Enemy;
 
-void Move_Enemy(Enemy *enemy, int x, int y) {
-	enemy->x_pos = x;
-	enemy->y_pos = y;
-}

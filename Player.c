@@ -7,7 +7,3 @@ typedef struct Player {
 	char character = '^';
 } Player;
 
-void move_Player(Player *player, int x, int y) {
-	player->x_pos = x;
-	player->y_pos = y;
-}
