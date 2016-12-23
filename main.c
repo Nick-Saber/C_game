@@ -2,15 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ncurses.h>
+#include <curses.h>
 #include <time.h>
 #include "Player.c"
 #include "Enemy.c"
 
-#define FALSE 0
-#define TRUE 1
-
-#define ncols 50
-#define nrows 25
 
 
 int display_Grid(char ** grid);
@@ -20,13 +16,6 @@ int main ()
 
 
 
-	//Initializing Player inside of the grid
-	Player player_1;
-	init_Player(&player_1);
-
-	//Initializing a single enemy inside of the grid
-	Enemy enemy_1;
-	init_Enemy(&enemy_1);
 
 
 	//create window, s.t. key inputs are allowed but not displayed
@@ -35,38 +24,61 @@ int main ()
 	noecho();
 	curs_set(FALSE);
 	keypad(stdscr,TRUE);
+	halfdelay(5);
 
-	//max x and y coordinates to deal with resizing
+	//max x and y coordinates to deal with initial positioning
 	int max_x=0;
 	int max_y=0;
+	getmaxyx(stdscr,max_y,max_x);
+
+	//Initializing Player inside of the grid
+	Player player_1;
+	player_1.x_pos=max_x/2;
+	player_1.y_pos=(max_y-1);
+	// player_1.character="^";
+
+	//Initializing a single enemy inside of the grid
+	Enemy enemy_1;
+	enemy_1.x_pos=max_x/2;
+	enemy_1.y_pos=0;
+	// enemy_1.character="V";
+
+	//key variable stores current key pressed
+	wchar_t key;
 
 	//start game
 	for(;;){
-
+		//refresh max x and y to deal with screen resizing
 		getmaxyx(stdscr,max_y,max_x);
 
-		//refresh screen every 1/2 second
-		if(((clock()/CLOCKS_PER_SEC)%1 == 0) || ((clock()/CLOCKS_PER_SEC)%1 == 0.5))
-			{
-			clear();
-			mvprintw(max_y-1,max_x/2,"^");
-			refresh();
-			}
-
-	}
-	return 0;
-}
-
-int display_Grid(char ** grid) 
-{
-	for(int i = 0; i < nrows; i++)
-	{	
-		for(int j = 0; j < ncols; j++)
+		//update positioning of characters every 1/2 second
+		if((key=getch()) != ERR)
 		{
-			printf("%c",grid[i][j]);
-		}
-		printf("\n");
-	}
+			switch(key)
+			{
+				case KEY_LEFT:
+					if(player_1.x_pos > 1)
+					{
+						player_1.x_pos-=1;
 
+					}
+					break;
+				case KEY_RIGHT:
+					if(player_1.x_pos < (max_x -1))
+					{
+						player_1.x_pos+=1;
+					}
+					break;
+			}
+		}
+
+		//display updated positions
+		clear();
+		mvprintw(player_1.y_pos,player_1.x_pos,"^");
+		mvprintw(enemy_1.y_pos,enemy_1.x_pos,"V");
+		refresh();
+
+	}
 	return 0;
 }
+
