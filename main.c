@@ -6,18 +6,13 @@
 #include <time.h>
 #include "Player.c"
 #include "Enemy.c"
-
+#include
 
 
 int display_Grid(char ** grid);
 
 int main () 
 {
-
-
-
-
-
 	//create window, s.t. key inputs are allowed but not displayed
 	initscr();
 	cbreak();
@@ -31,17 +26,20 @@ int main ()
 	int max_y=0;
 	getmaxyx(stdscr,max_y,max_x);
 
+
+
+
 	//Initializing Player inside of the grid
 	Player player_1;
 	player_1.x_pos=max_x/2;
 	player_1.y_pos=(max_y-1);
-	// player_1.character="^";
+	player_1.character="^";
 
 	//Initializing a single enemy inside of the grid
 	Enemy enemy_1;
 	enemy_1.x_pos=max_x/2;
 	enemy_1.y_pos=0;
-	// enemy_1.character="V";
+	enemy_1.character="V";
 
 	//key variable stores current key pressed
 	wchar_t key;
@@ -70,12 +68,16 @@ int main ()
 					}
 					break;
 			}
+			switch(key)
+			{
+
+			}
 		}
 
 		//display updated positions
 		clear();
-		mvprintw(player_1.y_pos,player_1.x_pos,"^");
-		mvprintw(enemy_1.y_pos,enemy_1.x_pos,"V");
+		mvprintw(player_1.y_pos,player_1.x_pos,player_1.character);
+		mvprintw(enemy_1.y_pos,enemy_1.x_pos,enemy_1.character);
 		refresh();
 
 	}
