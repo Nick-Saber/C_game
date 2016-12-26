@@ -19,8 +19,8 @@ bool update_Bullets(Player * plyr){
 		//update procedure for friendly player bullets
 		if(plyr->friendly)
 			{
-			//check if bullet has reached end of screen for friendly players
-			if(bullt->y_pos == 0)
+			//check if bullet has reached end of screen or outside of screen for friendly players
+			if(bullt->y_pos == 0 || bullt->x_pos>=max_x -1)
 				{
 				bullt->is_shot= FALSE;
 				freed=TRUE;
@@ -35,7 +35,7 @@ bool update_Bullets(Player * plyr){
 		if(!(plyr->friendly))
 			{
 		//check if bullet has reached end of screen for enemies
-			if(bullt->y_pos == max_y-1)
+			if(bullt->y_pos >= max_y-1 || bullt->x_pos>=max_x -1)
 				{
 				bullt->is_shot= FALSE;
 				freed=TRUE;
@@ -48,3 +48,8 @@ bool update_Bullets(Player * plyr){
 		}
 	return freed;
 	}
+
+
+
+
+
