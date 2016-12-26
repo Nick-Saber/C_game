@@ -3,8 +3,8 @@ typedef struct Player {
 	int y_pos;
 	char * character;
 	int ammo_size;
-	bullet ** ammo;
-	int friendly;
+	Bullet ** ammo;
+	bool friendly;
 
 
 } Player;
