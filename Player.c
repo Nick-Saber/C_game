@@ -4,7 +4,16 @@ typedef struct Player {
 	char * character;
 	int ammo_size;
 	bullet ** ammo;
+	int friendly;
 
 
 } Player;
 
+void init_ammo(int size. Player * plyr){
+	Bullet ** bullets = malloc(size*sizeof(Bullet *));
+	for(int i =0; i<size;i++){
+		*(ammo + i*sizeof(Bullet *)) = malloc(sizeof(Bullet));
+	}
+	plyr->ammo=bullets
+
+}
