@@ -3,8 +3,8 @@
 #include <string.h>
 #include <ncurses.h>
 #include <curses.h>
+#include "Bullet.c"
 #include "Player.c"
-#include "Enemy.c"
 
 
 int main () 
@@ -31,13 +31,15 @@ int main ()
 	player_1.y_pos=(max_y-1);
 	player_1.character="^";
 	player_1.friendly=TRUE;
+	init_ammo(5,&player_1);
 
 	//Initializing a single enemy inside of the grid
-	Enemy enemy_1;
+	Player enemy_1;
 	enemy_1.x_pos=max_x/2;
 	enemy_1.y_pos=0;
 	enemy_1.character="V";
 	enemy_1.friendly=FALSE;
+	init_ammo(5,&enemy_1);
 
 
 	//key variable stores current key pressed
@@ -67,13 +69,13 @@ int main ()
 						player_1.x_pos+=1;
 					}
 					break;
-				case KEY_UP;
+				case KEY_UP:
 					shoot(&player_1);
 					break;
 			}
 		}
-		update_bullets(&player_1);
-		update_bullets(&enemy_1);
+		update_bullets(&player_1,max_y,max_x);
+		update_bullets(&enemy_1,max_y,max_x);
 
 
 
@@ -82,8 +84,8 @@ int main ()
 		clear();
 		mvprintw(player_1.y_pos,player_1.x_pos,player_1.character);
 		mvprintw(enemy_1.y_pos,enemy_1.x_pos,enemy_1.character);
-		display_bullets(player_1);
-		display_bullets(enemy_1);
+		display_bullets(&player_1);
+		display_bullets(&enemy_1);
 		refresh();
 
 	}

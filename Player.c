@@ -9,19 +9,19 @@ typedef struct Player {
 
 } Player;
 
-void init_ammo(int size. Player * plyr){
+void init_ammo(int size, Player * plyr){
 	Bullet ** bullets = malloc(size*sizeof(Bullet *));
 	for(int i =0; i<size;i++){
-		*(ammo + i*sizeof(Bullet *)) = malloc(sizeof(Bullet));
+		*(bullets + i*sizeof(Bullet *)) = malloc(sizeof(Bullet));
 	}
-	plyr->ammo=bullets
+	plyr->ammo=bullets;
 }
 
 	//function that displays bullets of players to stdscr using ncurses library
-void display_bullets{Player * plyr}{
+void display_bullets(Player * plyr){
 	for(int i =0;i<plyr->ammo_size;i++)
 		{
-		Bullet * bullt= plyr->ammo + i*sizeof(Bullet *);
+		Bullet * bullt= *(plyr->ammo + i*sizeof(Bullet *));
 		mvprintw(bullt->y_pos,bullt->x_pos,bullt->character);
 		}
 }
@@ -31,9 +31,9 @@ void display_bullets{Player * plyr}{
 bool shoot(Player *player) {
 
 	// Iterate through ammo array and find the first free bullet. 
-	for(int i = 0; i < sizeOf(player->ammo_size); i++) 
+	for(int i = 0; i < player->ammo_size; i++) 
 	{
-		Bullet * bullet = player->ammo + (i*sizeOf(Bullet *));
+		Bullet * bullet = *(player->ammo + (i*sizeof(Bullet *)));
 
 		// If the bullet is not shot yet then update its position accordingly and shoot the bullet.
 		if (bullet->is_shot == FALSE) 
@@ -52,14 +52,14 @@ bool shoot(Player *player) {
 
 
 //updates bullet positions for player struct
-bool update_Bullets(Player * plyr){
+bool update_bullets(Player * plyr, int max_y,int max_x){
 	//boolean value returned at end, TRUE if one bullet is freed, FALSE otherwise
 	bool freed = FALSE;
 
 	for(int i =0; i<plyr->ammo_size;i++)
 		{
 		//get i'th bullet pointer in ammo array
-		Bullet * bullt = (plyr->ammo + i*sizeof(Bullet *));
+		Bullet * bullt = *(plyr->ammo + i*sizeof(Bullet *));
 
 		//update procedure for friendly player bullets
 		if(plyr->friendly)
