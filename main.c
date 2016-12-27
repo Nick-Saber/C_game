@@ -3,8 +3,8 @@
 #include <string.h>
 #include <ncurses.h>
 #include <curses.h>
-#include "Bullet.c"
-#include "Player.c"
+#include "bullet.c"
+#include "player.c"
 
 
 int main () 

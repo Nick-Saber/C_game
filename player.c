@@ -12,8 +12,11 @@ typedef struct Player {
 void init_ammo(int size, Player * plyr){
 	Bullet ** bullets = malloc(size*sizeof(Bullet *));
 	for(int i =0; i<size;i++){
-		*(bullets + i*sizeof(Bullet *)) = malloc(sizeof(Bullet));
+		Bullet * temp = malloc(sizeof(Bullet));
+		temp->is_shot=FALSE;
+		*(bullets + i*sizeof(Bullet *)) = temp;
 	}
+	plyr->ammo_size=size;
 	plyr->ammo=bullets;
 }
 
@@ -76,7 +79,7 @@ bool update_bullets(Player * plyr, int max_y,int max_x){
 					} 
 				else//update bullet position otherwise
 					{ 
-					bullt->y_pos++;
+					bullt->y_pos--;
 					}
 				}
 
@@ -91,7 +94,7 @@ bool update_bullets(Player * plyr, int max_y,int max_x){
 					} 
 				else
 					{ //update bullet position otherwise
-					bullt->y_pos--;
+					bullt->y_pos++;
 					}
 				}
 			}
