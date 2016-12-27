@@ -22,7 +22,10 @@ void display_bullets(Player * plyr){
 	for(int i =0;i<plyr->ammo_size;i++)
 		{
 		Bullet * bullt= *(plyr->ammo + i*sizeof(Bullet *));
-		mvprintw(bullt->y_pos,bullt->x_pos,bullt->character);
+		if(bullt->is_shot)
+			{//display bullet if its shot
+			mvprintw(bullt->y_pos,bullt->x_pos,bullt->character);
+			}
 		}
 }
 
@@ -60,36 +63,39 @@ bool update_bullets(Player * plyr, int max_y,int max_x){
 		{
 		//get i'th bullet pointer in ammo array
 		Bullet * bullt = *(plyr->ammo + i*sizeof(Bullet *));
-
-		//update procedure for friendly player bullets
-		if(plyr->friendly)
-			{
-			//check if bullet has reached end of screen or outside of screen for friendly players
-			if(bullt->y_pos == 0 || bullt->x_pos>=max_x -1)
+		if(bullt->is_shot)
+			{//update only if the bullet is shot
+			//update procedure for friendly player bullets
+			if(plyr->friendly)
 				{
-				bullt->is_shot= FALSE;
-				freed=TRUE;
-				} 
-			else//update bullet position otherwise
-				{ 
-				bullt->y_pos++;
+				//check if bullet has reached end of screen or outside of screen for friendly players
+				if(bullt->y_pos == 0 || bullt->x_pos>=max_x -1)
+					{
+					bullt->is_shot= FALSE;
+					freed=TRUE;
+					} 
+				else//update bullet position otherwise
+					{ 
+					bullt->y_pos++;
+					}
+				}
+
+			//update procedure for enemy player bullets	
+			if(!(plyr->friendly))
+				{
+			//check if bullet has reached end of screen for enemies
+				if(bullt->y_pos >= max_y-1 || bullt->x_pos>=max_x -1)
+					{
+					bullt->is_shot= FALSE;
+					freed=TRUE;
+					} 
+				else
+					{ //update bullet position otherwise
+					bullt->y_pos--;
+					}
 				}
 			}
 
-		//update procedure for enemy player bullets	
-		if(!(plyr->friendly))
-			{
-		//check if bullet has reached end of screen for enemies
-			if(bullt->y_pos >= max_y-1 || bullt->x_pos>=max_x -1)
-				{
-				bullt->is_shot= FALSE;
-				freed=TRUE;
-				} 
-			else
-				{ //update bullet position otherwise
-				bullt->y_pos--;
-				}
-			}
 		}
 	return freed;
 }
