@@ -45,6 +45,16 @@ int main ()
 	//key variable stores current key pressed
 	wchar_t key;
 
+
+	Bullet * temp_bullet=malloc(sizeof(Bullet));
+	temp_bullet->x_pos = max_x-1;
+	temp_bullet->y_pos = max_y -1;
+	temp_bullet->character= "f";
+	temp_bullet->is_shot=TRUE;
+	Player * temp_player = malloc(sizeof(Player));
+	temp_player->ammo=&temp_bullet;
+	temp_player->ammo_size=1;
+	temp_player->friendly=TRUE;
 	//start game
 	for(;;){
 		//refresh max x and y to deal with screen resizing
@@ -79,9 +89,11 @@ int main ()
 
 
 
-
 		//DISPLAY updated positions of a players, enemies and bullets
 		clear();
+		mvprintw(player_1.y_pos-2,player_1.x_pos-2, "bullet y_pos is");
+		mvprintw(player_1.y_pos-1,player_1.x_pos-1, "%i",temp_bullet->y_pos);
+
 		mvprintw(player_1.y_pos,player_1.x_pos,player_1.character);
 		mvprintw(enemy_1.y_pos,enemy_1.x_pos,enemy_1.character);
 		display_bullets(&player_1);

@@ -14,6 +14,7 @@ void init_ammo(int size, Player * plyr){
 	for(int i =0; i<size;i++){
 		Bullet * temp = malloc(sizeof(Bullet));
 		temp->is_shot=FALSE;
+		temp->character="|";
 		*(bullets + i*sizeof(Bullet *)) = temp;
 	}
 	plyr->ammo_size=size;
@@ -61,18 +62,18 @@ bool shoot(Player *player) {
 bool update_bullets(Player * plyr, int max_y,int max_x){
 	//boolean value returned at end, TRUE if one bullet is freed, FALSE otherwise
 	bool freed = FALSE;
-
 	for(int i =0; i<plyr->ammo_size;i++)
 		{
 		//get i'th bullet pointer in ammo array
 		Bullet * bullt = *(plyr->ammo + i*sizeof(Bullet *));
-		if(bullt->is_shot)
+
+		if(bullt->is_shot==TRUE)
 			{//update only if the bullet is shot
 			//update procedure for friendly player bullets
-			if(plyr->friendly)
+			if(plyr->friendly==TRUE)
 				{
 				//check if bullet has reached end of screen or outside of screen for friendly players
-				if(bullt->y_pos == 0 || bullt->x_pos>=max_x -1)
+				if(bullt->y_pos == 0 )
 					{
 					bullt->is_shot= FALSE;
 					freed=TRUE;
@@ -84,10 +85,10 @@ bool update_bullets(Player * plyr, int max_y,int max_x){
 				}
 
 			//update procedure for enemy player bullets	
-			if(!(plyr->friendly))
+			if(plyr->friendly==FALSE)
 				{
 			//check if bullet has reached end of screen for enemies
-				if(bullt->y_pos >= max_y-1 || bullt->x_pos>=max_x -1)
+				if(bullt->y_pos >= max_y-1)
 					{
 					bullt->is_shot= FALSE;
 					freed=TRUE;
