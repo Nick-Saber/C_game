@@ -30,7 +30,7 @@ int main ()
 	//Initializing Player inside of the grid
 	Player player_1;
 	player_1.x_pos=max_x/2;
-	player_1.y_pos=(max_y-1);
+	player_1.y_pos=(max_y-2);
 	player_1.character="^";
 	player_1.friendly=TRUE;
 	player_1.ammo_size=5;
@@ -65,6 +65,8 @@ int main ()
 	temp_player->ammo=&temp_bullet;
 	temp_player->ammo_size=1;
 	temp_player->friendly=TRUE;
+
+
 	//start game
 	for(;;){
 		//refresh max x and y to deal with screen resizing
@@ -80,7 +82,6 @@ int main ()
 					if(player_1.x_pos > 1)
 					{
 						player_1.x_pos-=1;
-
 					}
 					break;
 				case KEY_RIGHT:
@@ -104,6 +105,7 @@ int main ()
 		//DISPLAY updated positions of a players, enemies and bullets
 		clear();
 		display_players(num_players,players);
+		display_ammo(&player_1,max_y,max_x);
 		refresh();
 
 	}

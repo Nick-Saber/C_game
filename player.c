@@ -22,6 +22,7 @@ void init_ammo(int size, Player * plyr){
 }
 
 
+
 // This function handles the shooting of ammo 
 bool shoot(Player *player) {
 
