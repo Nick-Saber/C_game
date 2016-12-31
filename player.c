@@ -5,6 +5,7 @@ typedef struct Player {
 	int ammo_size;
 	Bullet ** ammo;
 	bool friendly;
+	bool alive;
 
 
 } Player;
@@ -18,18 +19,6 @@ void init_ammo(int size, Player * plyr){
 		bullets[i] = temp;
 	}
 	plyr->ammo=bullets;
-}
-
-	//function that displays bullets of players to stdscr using ncurses library
-void display_bullets(Player * plyr){
-	for(int i =0;i<plyr->ammo_size;i++)
-		{
-		Bullet * bullt= *(plyr->ammo + i);
-		if(bullt->is_shot)
-			{//display bullet if its shot
-			mvprintw(bullt->y_pos,bullt->x_pos,bullt->character);
-			}
-		}
 }
 
 
@@ -102,3 +91,15 @@ bool update_bullets(Player * plyr, int max_y,int max_x){
 		}
 	return freed;
 }
+
+
+
+
+
+
+
+
+
+
+
+
