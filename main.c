@@ -24,8 +24,10 @@ int main ()
 
 
 	//array of all players, first player is always the user
-	int num_players=2;
-	Player ** players[2];
+	int num_enemies=1;
+	int num_friendlies=1;
+	Player ** players[num_friendlies+num_enemies];
+
 
 	//Initializing Player inside of the grid
 	Player player_1;
@@ -100,15 +102,29 @@ int main ()
 
 
 
+		//go through all enemies to check if they've already been shot if so make them dead
+		make_dead(players+num_friendlies,num_enemies);
+
+
+		//if enemies are shot 
+		is_enemy_shot(players,num_enemies,num_friendlies);
+
 
 
 		//DISPLAY updated positions of a players, enemies and bullets
 		clear();
-		display_players(num_players,players);
+		display_players(num_friendlies+num_enemies,players);
 		display_ammo(&player_1,max_y,max_x);
 		refresh();
 
 	}
 	return 0;
 }
+
+
+
+
+
+
+
 

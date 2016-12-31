@@ -94,6 +94,55 @@ bool update_bullets(Player * plyr, int max_y,int max_x){
 }
 
 
+//check through all shot bullets to see if the hit (are in the same position as) plyr argument
+bool did_bullet_hit(Player * plyr, Player ** plyrs, int num_players){
+	//iterate through all alive players
+	int x_pos =plyr->x_pos;
+	int y_pos = plyr->y_pos;
+	for(int i = 0; i<num_players;i++){
+	  Player * temp_plyr=plyrs[i];
+	  //iterate through all bullets of a player
+	  for(int j =0;j<temp_plyr->ammo_size;j++){
+	  	Bullet * bullt = temp_plyr->ammo[j];
+	  	if ((bullt->is_shot==TRUE) && (bullt->x_pos==x_pos) && (bullt->y_pos==y_pos))
+	  	{
+	  		//if bullet is shot and in position of character
+	  		bullt->is_shot=FALSE;
+	  		return TRUE;
+	  	}
+	  }
+	}
+	return FALSE;
+}
+
+//makes enemy dead after is shot
+void make_dead(Player ** enemies, int num_enemies){
+	for(int i =0;i<num_enemies;i++){
+		Player * enemy=enemies[i];
+		if(strcmp(enemy->character,"X")==0){
+			enemy->alive=FALSE;
+		}
+	}
+}
+
+
+int is_enemy_shot(Player ** all_players, int num_enemies,int num_friendlies){
+	int num_shot=0;
+
+	for(int i = 0;i<num_enemies;i++){
+		Player * enemy=all_players[i+num_friendlies];
+		//If an alive enemy is shot change its character to X to represent dead
+		if(enemy->alive==TRUE){
+			if(did_bullet_hit(enemy,all_players,num_enemies+num_friendlies)==TRUE){
+				num_shot++;
+				enemy->character="X";
+			}
+		}
+	}
+
+	return num_shot;
+}
+
 
 
 
