@@ -32,6 +32,25 @@ void display_bullets(Player * plyr){
 		}
 }
 
+//function that displays ammo at the bottom right of the screen
+void display_ammo(Player *playr, int max_y, int max_x){
+	int temp = 0;
+
+	//iterating through the bullets of the player and finding how many are not shot yet
+	for(int i = 0; i<playr->ammo_size;i++) 
+		{
+		Bullet * bullt = *(playr->ammo+i);
+		if(bullt->is_shot == FALSE)
+			{
+				temp++;
+			}
+		} 
+	//printing out the numbers of bullets at the bottom right of the screen
+	for(int i = 0; i<temp;i++)
+		{
+			mvprintw(max_y-1,max_x-1-i,"|");
+		}
+}
 
 // This function handles the shooting of ammo 
 bool shoot(Player *player) {

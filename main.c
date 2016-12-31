@@ -15,7 +15,7 @@ int main ()
 	noecho();
 	curs_set(FALSE);
 	keypad(stdscr,TRUE);
-	halfdelay(5);
+	halfdelay(1);
 
 	//max x and y coordinates to deal with initial positioning
 	int max_x=0;
@@ -28,7 +28,7 @@ int main ()
 	//Initializing Player inside of the grid
 	Player player_1;
 	player_1.x_pos=max_x/2;
-	player_1.y_pos=(max_y-1);
+	player_1.y_pos=(max_y-2);
 	player_1.character="^";
 	player_1.friendly=TRUE;
 	player_1.ammo_size=5;
@@ -57,6 +57,8 @@ int main ()
 	temp_player->ammo=&temp_bullet;
 	temp_player->ammo_size=1;
 	temp_player->friendly=TRUE;
+
+
 	//start game
 	for(;;){
 		//refresh max x and y to deal with screen resizing
@@ -72,7 +74,6 @@ int main ()
 					if(player_1.x_pos > 1)
 					{
 						player_1.x_pos-=1;
-
 					}
 					break;
 				case KEY_RIGHT:
@@ -97,6 +98,7 @@ int main ()
 		mvprintw(enemy_1.y_pos,enemy_1.x_pos,enemy_1.character);
 		display_bullets(&player_1);
 		display_bullets(&enemy_1);
+		display_ammo(&player_1,max_y,max_x);
 		refresh();
 
 	}
