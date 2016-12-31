@@ -15,9 +15,8 @@ void init_ammo(int size, Player * plyr){
 		Bullet * temp = malloc(sizeof(Bullet));
 		temp->is_shot=FALSE;
 		temp->character="|";
-		*(bullets + i*sizeof(Bullet *)) = temp;
+		bullets[i] = temp;
 	}
-	plyr->ammo_size=size;
 	plyr->ammo=bullets;
 }
 
@@ -25,7 +24,7 @@ void init_ammo(int size, Player * plyr){
 void display_bullets(Player * plyr){
 	for(int i =0;i<plyr->ammo_size;i++)
 		{
-		Bullet * bullt= *(plyr->ammo + i*sizeof(Bullet *));
+		Bullet * bullt= *(plyr->ammo + i);
 		if(bullt->is_shot)
 			{//display bullet if its shot
 			mvprintw(bullt->y_pos,bullt->x_pos,bullt->character);
@@ -40,7 +39,7 @@ bool shoot(Player *player) {
 	// Iterate through ammo array and find the first free bullet. 
 	for(int i = 0; i < player->ammo_size; i++) 
 	{
-		Bullet * bullet = *(player->ammo + (i*sizeof(Bullet *)));
+		Bullet * bullet = *(player->ammo + i);
 
 		// If the bullet is not shot yet then update its position accordingly and shoot the bullet.
 		if (bullet->is_shot == FALSE) 
@@ -65,7 +64,7 @@ bool update_bullets(Player * plyr, int max_y,int max_x){
 	for(int i =0; i<plyr->ammo_size;i++)
 		{
 		//get i'th bullet pointer in ammo array
-		Bullet * bullt = *(plyr->ammo + i*sizeof(Bullet *));
+		Bullet * bullt = *(plyr->ammo + i);
 
 		if(bullt->is_shot==TRUE)
 			{//update only if the bullet is shot

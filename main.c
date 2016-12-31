@@ -31,7 +31,8 @@ int main ()
 	player_1.y_pos=(max_y-1);
 	player_1.character="^";
 	player_1.friendly=TRUE;
-	init_ammo(5,&player_1);
+	player_1.ammo_size=5;
+	init_ammo(player_1.ammo_size,&player_1);
 
 	//Initializing a single enemy inside of the grid
 	Player enemy_1;
@@ -39,7 +40,8 @@ int main ()
 	enemy_1.y_pos=0;
 	enemy_1.character="V";
 	enemy_1.friendly=FALSE;
-	init_ammo(5,&enemy_1);
+	enemy_1.ammo_size=5;
+	init_ammo(enemy_1.ammo_size,&enemy_1);
 
 
 	//key variable stores current key pressed
@@ -91,9 +93,6 @@ int main ()
 
 		//DISPLAY updated positions of a players, enemies and bullets
 		clear();
-		mvprintw(player_1.y_pos-2,player_1.x_pos-2, "bullet y_pos is");
-		mvprintw(player_1.y_pos-1,player_1.x_pos-1, "%i",temp_bullet->y_pos);
-
 		mvprintw(player_1.y_pos,player_1.x_pos,player_1.character);
 		mvprintw(enemy_1.y_pos,enemy_1.x_pos,enemy_1.character);
 		display_bullets(&player_1);
