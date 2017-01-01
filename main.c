@@ -8,25 +8,53 @@
 #include "display.c"
 #include "state.c"
 
+#define MENU 0
+#define PLAY 1
+
+static int playmode(int level);
+static int main_menu();
+
+
 int main () 
 {
+
+//initial mode is main menu
+int mode=MENU;
+
+for(;;){
+	switch(mode){
+		case MENU:
+			mode = main_menu();
+			break;
+
+		case PLAY:
+			mode = playmode(1);
+			break;
+		}
+	}
+}
+
+static int playmode(int level){
 	//create window, s.t. key inputs are allowed but not displayed
 	initscr();
 	cbreak();
 	noecho();
 	curs_set(FALSE);
-	keypad(stdscr,TRUE);
+	WINDOW * wndw=stdscr;
+	keypad(wndw,TRUE);
 	halfdelay(1);
 
 	//max x and y coordinates to deal with initial positioning
 	int max_x=0;
 	int max_y=0;
-	getmaxyx(stdscr,max_y,max_x);
+	getmaxyx(wndw,max_y,max_x);
 
 
 	//array of all players, first player is always the user
-	int num_players=2;
-	Player ** players[2];
+	int num_enemies=level;
+	int num_friendlies=1;
+	Player ** players[num_friendlies+num_enemies];
+
 
 	//Initializing Player inside of the grid
 	Player player_1;
@@ -41,16 +69,19 @@ int main ()
 	players[0]=&player_1;
 
 	//Initializing a single enemy inside of the grid
-	Player enemy_1;
-	enemy_1.x_pos=max_x/2;
-	enemy_1.y_pos=0;
-	enemy_1.character="V";
-	enemy_1.friendly=FALSE;
-	enemy_1.ammo_size=5;
-	enemy_1.alive=TRUE;
-	init_ammo(enemy_1.ammo_size,&enemy_1);
+	for(int i =0; i<level;i++){
+	Player * enemy = malloc(sizeof(Player));
 
-	players[1]=&enemy_1;
+	enemy->x_pos=i*(max_x/8);
+	enemy->y_pos=floor(i/4);
+	enemy->character="V";
+	enemy->friendly=FALSE;
+	enemy->ammo_size=5;
+	enemy->alive=TRUE;
+	init_ammo(enemy->ammo_size,enemy);
+
+	players[num_friendlies + i]=enemy;
+	}
 
 
 	//key variable stores current key pressed
@@ -71,11 +102,11 @@ int main ()
 	//start game
 	for(;;){
 		//refresh max x and y to deal with screen resizing
-		getmaxyx(stdscr,max_y,max_x);
+		getmaxyx(wndw,max_y,max_x);
 
 
 		//UPDATE positioning of characters and bullets every 1/2 second
-		if((key=getch()) != ERR)
+		if((key=wgetch(wndw)) != ERR)
 		{
 			switch(key)
 			{
@@ -94,10 +125,23 @@ int main ()
 				case KEY_UP:
 					shoot(&player_1);
 					break;
+					//113 is ASCII value for key q
+				case 113:
+					return MENU;
+
 			}
 		}
-		update_bullets(&player_1,max_y,max_x);
-		update_bullets(&enemy_1,max_y,max_x);
+		//update bullets for all characters
+		for(int j =0;j<num_friendlies+num_enemies;j++){
+		update_bullets(players[j],max_y,max_x);
+		}	
+
+		//make dead is called before is_enemy_shot so that
+		// when an enemy gets hit an X is displayed and
+		//then on the next iteration of the for loop
+		//the enemies alive member will be switched to false
+		//this is so that display_players will display the X
+
 
 		//This is used to test the first function within the state.c file,
 		/*
@@ -107,20 +151,100 @@ int main ()
 				avg_MHD_bullets = compute_MHD_bullets(i, players, 2);
 			}
 		*/
-		
-		
-
-		//DISPLAY updated positions of a players, enemies and bullets
-		clear();
+	
 
 		//this is also for testing state.c
 		//mvprintw(max_y-3,5,"avg MHD %i", avg_MHD_bullets);
 
-		display_players(num_players,players);
-		display_ammo(&player_1,max_y,max_x);
-		refresh();
+		//go through all enemies to check if they've already been shot if so make them dead
+		make_dead(players+num_friendlies,num_enemies);
+
+
+		//if enemies are shot 
+		is_enemy_shot(players,num_enemies,num_friendlies);
+
+
+
+		//DISPLAY updated positions of a players, enemies and bullets
+		wclear(wndw);
+		display_players(wndw, num_friendlies+num_enemies,players);
+		display_ammo(wndw, &player_1,max_y,max_x);
+		wrefresh(wndw);
 
 	}
 	return 0;
 }
+
+static int main_menu(){
+	//create window, s.t. key inputs are allowed but not displayed
+	initscr();
+	cbreak();
+	noecho();
+	curs_set(FALSE);
+	WINDOW * wndw=stdscr;
+	keypad(wndw,TRUE);
+	halfdelay(1);
+
+	//max x and y coordinates to deal with initial positioning
+	int max_x=0;
+	int max_y=0;
+	getmaxyx(wndw,max_y,max_x);
+
+	//cursor variable for selecting options
+	int cursor = 2;
+	wchar_t key;
+
+	for(;;){
+		//refresh max x and y to deal with screen resizing
+		getmaxyx(wndw,max_y,max_x);
+
+
+		//UPDATE positioning of characters and bullets every 1/2 second
+		if((key=wgetch(wndw)) != ERR)
+		{
+			switch(key)
+			{
+				case KEY_DOWN:
+					if(cursor<4)
+					{
+						cursor++;
+					}
+					break;
+				case KEY_UP:
+					if(cursor>2){
+						cursor--;
+					}
+					break;
+					//10 is ASCII value for the enter key, since KEY_ENTER is only for nurmeric keypad enter in ncurses
+				case 10:
+					if(cursor==2)
+					{
+						return PLAY;
+					}
+					if(cursor==4)
+					{
+						wclear(wndw);
+						delwin(wndw);
+						endwin();
+						exit(1);
+					}	
+					break;
+
+
+			}
+		}
+
+		wclear(wndw);
+		mvwprintw(wndw, 2*max_y/6,max_x/2, "PLAY" );
+		mvwprintw(wndw, 3*max_y/6,max_x/2, "INFO" );
+		mvwprintw(wndw, 4*max_y/6,max_x/2, "QUIT" );
+		mvwprintw(wndw,cursor*max_y/6,max_x/2 -3
+
+			,">");
+		wrefresh(wndw);
+	}
+}
+
+
+
 
