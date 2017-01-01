@@ -6,8 +6,7 @@ typedef struct Player {
 	Bullet ** ammo;
 	bool friendly;
 	bool alive;
-
-
+	
 } Player;
 
 void init_ammo(int size, Player * plyr){
