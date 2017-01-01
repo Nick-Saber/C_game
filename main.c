@@ -6,6 +6,7 @@
 #include "bullet.c"
 #include "player.c"
 #include "display.c"
+#include "state.c"
 
 int main () 
 {
@@ -98,12 +99,23 @@ int main ()
 		update_bullets(&player_1,max_y,max_x);
 		update_bullets(&enemy_1,max_y,max_x);
 
-
-
-
+		//This is used to test the first function within the state.c file,
+		/*
+		int avg_MHD_bullets;
+		for (int i = 0; i<2;i++)
+			{
+				avg_MHD_bullets = compute_MHD_bullets(i, players, 2);
+			}
+		*/
+		
+		
 
 		//DISPLAY updated positions of a players, enemies and bullets
 		clear();
+
+		//this is also for testing state.c
+		//mvprintw(max_y-3,5,"avg MHD %i", avg_MHD_bullets);
+
 		display_players(num_players,players);
 		display_ammo(&player_1,max_y,max_x);
 		refresh();
