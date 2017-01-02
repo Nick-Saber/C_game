@@ -20,6 +20,9 @@ int main ()
 //initial mode is main menu
 int mode=MENU;
 
+
+
+//Main for loop for switching between main menu, and play mode
 for(;;){
 	switch(mode){
 		case MENU:
