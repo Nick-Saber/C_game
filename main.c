@@ -14,7 +14,7 @@
 #define PLAY 1
 #define INFO 2
 #define SCORE 3
-#define TIMEOUT_DELAY 50
+#define TIMEOUT_DELAY 100
 
 //different game mode functions that change display to terminal
 static int playmode(int * level, int * score);
@@ -113,7 +113,7 @@ static int playmode(int * level,int * score){
 		enemy->ammo_size=5;
 		enemy->alive=TRUE;
 		init_ammo(enemy->ammo_size,enemy);
-		
+
 		players[num_friendlies + i]=enemy;
 	}
 
@@ -181,15 +181,11 @@ static int playmode(int * level,int * score){
 		}
 
 
-		//update bullets for all characters
-		for(int j =0;j<num_friendlies+num_enemies;j++){
-		update_bullets(players[j],p_max_y,p_max_x);
-		}	
+		
 
 		//Go through all the enemies, compute their next action and update their current positions
 		for (int i = 1; i < num_enemies + num_friendlies; i++) 
 			{
-				srand(time(NULL));
 				int move = (rand() % 5) + 1;//compute_action(i, players, num_friendlies+num_enemies, max_y,max_x);
 				switch(move) 
 					{
@@ -202,7 +198,7 @@ static int playmode(int * level,int * score){
 							players[i]->y_pos-=1;
 							break;
 						case 2:
-							if (players[i]->y_pos+1 > max_y/2)
+							if (players[i]->y_pos+1 > p_max_y/2)
 								{
 									i--;
 									break;
@@ -210,7 +206,7 @@ static int playmode(int * level,int * score){
 							players[i]->y_pos+=1;
 							break;
 						case 3:
-							if (players[i]->x_pos+1 > max_x-2)
+							if (players[i]->x_pos+1 > p_max_x-2)
 								{
 									i--;
 									break;
@@ -231,6 +227,10 @@ static int playmode(int * level,int * score){
 					}
 			}
 
+		//update bullets for all characters
+		for(int j =0;j<num_friendlies+num_enemies;j++){
+		update_bullets(players[j],p_max_y,p_max_x);
+		}	
 
 		//make dead is called before is_enemy_shot so that
 		// when an enemy gets hit an X is displayed and
@@ -240,6 +240,8 @@ static int playmode(int * level,int * score){
 
 		//go through all enemies to check if they've already been shot if so make them dead
 		make_dead(players+num_friendlies,&num_enemies);
+
+
 		if(num_enemies==0){
 			(*level)+=1;
 			return PLAY;
@@ -392,6 +394,9 @@ static int game_info(int level,int score){
 	return -1;
 }
 
+//Temporary function for moving enemies. This will be replaced later with functions from state.c
+void move_enemy() {
 
+}
 
 
