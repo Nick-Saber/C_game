@@ -12,6 +12,7 @@ void display_bullets(WINDOW * wndw, Player * plyr){
 		}
 }
 
+//Displays all alive players and bullets they've fired to the wndw
 void display_players(WINDOW * wndw, int size, Player ** plyrs){
 
 	for(int i =0; i<size;i++){
