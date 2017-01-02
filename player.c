@@ -115,14 +115,16 @@ bool did_bullet_hit(Player * plyr, Player ** plyrs, int num_players){
 }
 
 //makes enemy dead after is shot
-void make_dead(Player ** enemies, int * num_enemies){
-	for(int i =0;i<(*num_enemies);i++){
+void make_dead(Player ** enemies, int num_enemies,int * num_dead_enemies){
+	int counter=0;
+	for(int i =0;i<num_enemies;i++){
 		Player * enemy=enemies[i];
-		if(strcmp(enemy->character,"X")==0){
+		if((strcmp(enemy->character,"X")==0) && (enemy->alive==TRUE)){
 			enemy->alive=FALSE;
-			(*num_enemies)-=1;
+			counter++;
 		}
 	}
+	(*num_dead_enemies)+=counter;
 }
 
 
@@ -142,6 +144,23 @@ int is_enemy_shot(Player ** all_players, int num_enemies,int num_friendlies){
 
 	return num_shot;
 }
+
+
+//frees all allocated memory related to plyrs
+void delete_players(Player ** plyrs, int size){
+	for(int i =0;i<size;i++){
+		Player * plyr= plyrs[i];
+		Bullet ** ammo=plyr->ammo;
+		for(int j=0;j<plyr->ammo_size;j++){
+			Bullet * bullt = ammo[j];
+			free(bullt);
+		}
+		free(ammo);
+		free(plyr);
+	}	
+	free(plyrs);
+}
+
 
 
 

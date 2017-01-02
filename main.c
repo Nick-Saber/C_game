@@ -87,20 +87,22 @@ static int playmode(int * level,int * score){
 	//array of all players, first player is always the user
 	int num_enemies=*level;
 	int num_friendlies=1;
-	Player * players[num_friendlies+num_enemies];
+	Player ** players=malloc((num_friendlies +num_enemies)*sizeof(Player *));
 
+	//variable used to track how many enemies have been killed on this level
+	int num_dead_enemies=0;
 
 	//Initializing Player inside of the grid
-	Player player_1;
-	player_1.x_pos=p_max_x/2;
-	player_1.y_pos=(p_max_y-1);
-	player_1.character="A";
-	player_1.friendly=TRUE;
-	player_1.ammo_size=5;
-	player_1.alive=TRUE;
-	init_ammo(player_1.ammo_size,&player_1);
+	Player * player_1 = malloc(sizeof(Player));
+	player_1->x_pos=p_max_x/2;
+	player_1->y_pos=(p_max_y-1);
+	player_1->character="A";
+	player_1->friendly=TRUE;
+	player_1->ammo_size=20;
+	player_1->alive=TRUE;
+	init_ammo(player_1->ammo_size,player_1);
 
-	players[0]=&player_1;
+	players[0]=player_1;
 
 	//Initializing enemies inside of the grid
 	for(int i =0; i<*level;i++){
@@ -110,7 +112,7 @@ static int playmode(int * level,int * score){
 		enemy->y_pos=floor(i/4);
 		enemy->character="V";
 		enemy->friendly=FALSE;
-		enemy->ammo_size=5;
+		enemy->ammo_size=1;
 		enemy->alive=TRUE;
 		init_ammo(enemy->ammo_size,enemy);
 
@@ -150,7 +152,7 @@ static int playmode(int * level,int * score){
 
 
 		// always make sure the player is at the bottom of the play window
-		player_1.y_pos=p_max_y -1;
+		player_1->y_pos=p_max_y -1;
 
 
 		//UPDATE positioning of characters and bullets every 1/2 second
@@ -159,19 +161,19 @@ static int playmode(int * level,int * score){
 			switch(key)
 			{
 				case KEY_LEFT:
-					if(player_1.x_pos > 0)
+					if(player_1->x_pos > 0)
 					{
-						player_1.x_pos-=1;
+						player_1->x_pos-=1;
 					}
 					break;
 				case KEY_RIGHT:
-					if(player_1.x_pos < (p_max_x))
+					if(player_1->x_pos < (p_max_x))
 					{
-						player_1.x_pos+=1;
+						player_1->x_pos+=1;
 					}
 					break;
 				case KEY_UP:
-					shoot(&player_1);
+					shoot(player_1);
 					break;
 					//113 is ASCII value for key q
 				case 113:
@@ -239,11 +241,12 @@ static int playmode(int * level,int * score){
 		//this is so that display_players will display the X
 
 		//go through all enemies to check if they've already been shot if so make them dead
-		make_dead(players+num_friendlies,&num_enemies);
+		make_dead(players+num_friendlies,num_enemies,&num_dead_enemies);
 
 
-		if(num_enemies==0){
+		if(num_enemies==num_dead_enemies){
 			(*level)+=1;
+			delete_players(players, num_friendlies+num_enemies);
 			return PLAY;
 		}
 
@@ -253,12 +256,14 @@ static int playmode(int * level,int * score){
 
 
 
+
+
 		//DISPLAY updated positions of a players, enemies and bullets
 		wclear(play_wndw);
 		wclear(dsp_wndw);
 		display_players(play_wndw, num_friendlies+num_enemies,players);
 		display_ammo(dsp_wndw, players[0],d_max_y,d_max_x);
-		mvwprintw(dsp_wndw,0,d_max_y,"SCORE:%i",*score);
+		mvwprintw(dsp_wndw,0,0,"SCORE:%i",*score);
 		wrefresh(play_wndw);
 		wrefresh(dsp_wndw);
 
