@@ -115,11 +115,12 @@ bool did_bullet_hit(Player * plyr, Player ** plyrs, int num_players){
 }
 
 //makes enemy dead after is shot
-void make_dead(Player ** enemies, int num_enemies){
-	for(int i =0;i<num_enemies;i++){
+void make_dead(Player ** enemies, int * num_enemies){
+	for(int i =0;i<(*num_enemies);i++){
 		Player * enemy=enemies[i];
 		if(strcmp(enemy->character,"X")==0){
 			enemy->alive=FALSE;
+			(*num_enemies)-=1;
 		}
 	}
 }

@@ -11,7 +11,8 @@
 #define MENU 0
 #define PLAY 1
 
-static int playmode(int level);
+//different game mode functions that change display to terminal
+static int playmode(int * level, int * score);
 static int main_menu();
 
 
@@ -20,7 +21,8 @@ int main ()
 
 //initial mode is main menu
 int mode=MENU;
-
+int level = 1;
+int score = 0;
 
 
 //Main for loop for switching between main menu, and play mode
@@ -31,13 +33,13 @@ for(;;){
 			break;
 
 		case PLAY:
-			mode = playmode(1);
+			mode = playmode(&level,&score);
 			break;
 		}
 	}
 }
 
-static int playmode(int level){
+static int playmode(int * level,int * score){
 	//create window, s.t. key inputs are allowed but not displayed
 	// also make variables to record stdscr max x and y, past and present
 	//, these variables allow us to detect screen resizing and change display accordingly
@@ -55,7 +57,7 @@ static int playmode(int level){
 	//make upper play window where game takes place
 	WINDOW * play_wndw=newwin(pres_scr_y-dsp_wndw_size,pres_scr_x, 0,0);
 	keypad(play_wndw,TRUE);
-	halfdelay(1);
+	wtimeout(play_wndw,25);
 
 	//make display window where things like ammo, level, and score are displayed
 	WINDOW * dsp_wndw=newwin(dsp_wndw_size,pres_scr_x, pres_scr_y-dsp_wndw_size,0);
@@ -71,7 +73,7 @@ static int playmode(int level){
 
 
 	//array of all players, first player is always the user
-	int num_enemies=level;
+	int num_enemies=*level;
 	int num_friendlies=1;
 	Player ** players[num_friendlies+num_enemies];
 
@@ -80,7 +82,7 @@ static int playmode(int level){
 	Player player_1;
 	player_1.x_pos=p_max_x/2;
 	player_1.y_pos=(p_max_y-1);
-	player_1.character="^";
+	player_1.character="A";
 	player_1.friendly=TRUE;
 	player_1.ammo_size=5;
 	player_1.alive=TRUE;
@@ -89,7 +91,7 @@ static int playmode(int level){
 	players[0]=&player_1;
 
 	//Initializing a single enemy inside of the grid
-	for(int i =0; i<level;i++){
+	for(int i =0; i<*level;i++){
 	Player * enemy = malloc(sizeof(Player));
 
 	enemy->x_pos=i*(p_max_x/8);
@@ -122,6 +124,8 @@ static int playmode(int level){
 			delwin(dsp_wndw);
 			play_wndw=newwin(pres_scr_y-dsp_wndw_size,pres_scr_x, 0,0);
 			keypad(play_wndw,TRUE);
+			wtimeout(play_wndw,25);
+
 			dsp_wndw=newwin(dsp_wndw_size,pres_scr_x, pres_scr_y-dsp_wndw_size,0);	
 		}
 
@@ -131,6 +135,10 @@ static int playmode(int level){
 		getmaxyx(play_wndw,p_max_y,p_max_x);
 		getmaxyx(dsp_wndw,d_max_y,d_max_x);
 
+
+
+		// always make sure the player is at the bottom of the play window
+		player_1.y_pos=p_max_y -1;
 
 
 		//UPDATE positioning of characters and bullets every 1/2 second
@@ -161,14 +169,6 @@ static int playmode(int level){
 		}
 
 
-		for(int j = 0; j<num_friendlies+num_enemies;j++){
-			Player * plyr=players[j];
-			if(plyr->friendly==TRUE){
-				plyr->y_pos=p_max_y-1;
-			} else{
-				plyr->y_pos=0;
-			}
-		}
 		//update bullets for all characters
 		for(int j =0;j<num_friendlies+num_enemies;j++){
 		update_bullets(players[j],p_max_y,p_max_x);
@@ -195,11 +195,15 @@ static int playmode(int level){
 		//mvprintw(max_y-3,5,"avg MHD %i", avg_MHD_bullets);
 
 		//go through all enemies to check if they've already been shot if so make them dead
-		make_dead(players+num_friendlies,num_enemies);
+		make_dead(players+num_friendlies,&num_enemies);
+		if(num_enemies==0){
+			(*level)+=1;
+			return PLAY;
+		}
 
 
 		//if enemies are shot 
-		is_enemy_shot(players,num_enemies,num_friendlies);
+		*score+=100*is_enemy_shot(players,num_enemies,num_friendlies);
 
 
 
@@ -208,11 +212,11 @@ static int playmode(int level){
 		wclear(dsp_wndw);
 		display_players(play_wndw, num_friendlies+num_enemies,players);
 		display_ammo(dsp_wndw, players[0],d_max_y,d_max_x);
+		mvwprintw(dsp_wndw,0,d_max_y,"SCORE:%i",*score);
 		wrefresh(play_wndw);
 		wrefresh(dsp_wndw);
 
 	}
-	return 0;
 }
 
 
