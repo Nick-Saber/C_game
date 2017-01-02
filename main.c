@@ -6,6 +6,7 @@
 #include "bullet.c"
 #include "player.c"
 #include "display.c"
+#include "state.c"
 
 #define MENU 0
 #define PLAY 1
@@ -143,6 +144,20 @@ static int playmode(int level){
 		//then on the next iteration of the for loop
 		//the enemies alive member will be switched to false
 		//this is so that display_players will display the X
+
+
+		//This is used to test the first function within the state.c file,
+		/*
+		int avg_MHD_bullets;
+		for (int i = 0; i<2;i++)
+			{
+				avg_MHD_bullets = compute_MHD_bullets(i, players, 2);
+			}
+		*/
+	
+
+		//this is also for testing state.c
+		//mvprintw(max_y-3,5,"avg MHD %i", avg_MHD_bullets);
 
 		//go through all enemies to check if they've already been shot if so make them dead
 		make_dead(players+num_friendlies,num_enemies);
