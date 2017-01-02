@@ -267,6 +267,8 @@ static int playmode(int * level,int * score){
 
 
 
+
+
 		//DISPLAY updated positions of a players, enemies and bullets
 		wclear(play_wndw);
 		wclear(dsp_wndw);
