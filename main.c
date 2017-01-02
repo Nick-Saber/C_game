@@ -10,10 +10,14 @@
 
 #define MENU 0
 #define PLAY 1
+#define INFO 2
+#define SCORE 3
+#define TIMEOUT_DELAY 50
 
 //different game mode functions that change display to terminal
 static int playmode(int * level, int * score);
 static int main_menu();
+static int game_info(int level, int score);
 
 
 int main () 
@@ -35,8 +39,14 @@ for(;;){
 		case PLAY:
 			mode = playmode(&level,&score);
 			break;
+
+		case INFO:
+			mode = game_info(level,score); 
+
 		}
 	}
+	//ERROR
+	return -1;
 }
 
 static int playmode(int * level,int * score){
@@ -57,7 +67,7 @@ static int playmode(int * level,int * score){
 	//make upper play window where game takes place
 	WINDOW * play_wndw=newwin(pres_scr_y-dsp_wndw_size,pres_scr_x, 0,0);
 	keypad(play_wndw,TRUE);
-	wtimeout(play_wndw,25);
+	wtimeout(play_wndw,TIMEOUT_DELAY);
 
 	//make display window where things like ammo, level, and score are displayed
 	WINDOW * dsp_wndw=newwin(dsp_wndw_size,pres_scr_x, pres_scr_y-dsp_wndw_size,0);
@@ -75,7 +85,7 @@ static int playmode(int * level,int * score){
 	//array of all players, first player is always the user
 	int num_enemies=*level;
 	int num_friendlies=1;
-	Player ** players[num_friendlies+num_enemies];
+	Player * players[num_friendlies+num_enemies];
 
 
 	//Initializing Player inside of the grid
@@ -124,7 +134,7 @@ static int playmode(int * level,int * score){
 			delwin(dsp_wndw);
 			play_wndw=newwin(pres_scr_y-dsp_wndw_size,pres_scr_x, 0,0);
 			keypad(play_wndw,TRUE);
-			wtimeout(play_wndw,25);
+			wtimeout(play_wndw,TIMEOUT_DELAY);
 
 			dsp_wndw=newwin(dsp_wndw_size,pres_scr_x, pres_scr_y-dsp_wndw_size,0);	
 		}
@@ -217,6 +227,8 @@ static int playmode(int * level,int * score){
 		wrefresh(dsp_wndw);
 
 	}
+	//ERROR
+	return -1;
 }
 
 
@@ -249,43 +261,101 @@ static int main_menu(){
 		{
 			switch(key)
 			{
+				//move the selector pointer
 				case KEY_DOWN:
-					if(cursor<4)
+					if(cursor==5)
 					{
+						cursor=2;
+					} else{
 						cursor++;
 					}
 					break;
 				case KEY_UP:
-					if(cursor>2){
+					if(cursor==2){
+						cursor=5;
+					} else{
 						cursor--;
 					}
 					break;
-					//10 is ASCII value for the enter key, since KEY_ENTER is only for nurmeric keypad enter in ncurses
+				//10 is ASCII value for the enter key
+				// since KEY_ENTER is only for nurmeric keypad enter in ncurses
 				case 10:
-					if(cursor==2)
-					{	
-						return PLAY;
+					switch(cursor){
+						case 2:
+							return PLAY;
+						case 3:
+							return INFO;
+						case 4:
+							break;
+							//return SCORES;
+						case 5:
+							wclear(wndw);
+							delwin(wndw);
+							endwin();
+							exit(1);
 					}
-					if(cursor==4)
-					{
-						wclear(wndw);
-						delwin(wndw);
-						endwin();
-						exit(1);
-					}	
-					break;
-
 
 			}
 		}
 
 		wclear(wndw);
-		mvwprintw(wndw, 2*max_y/6,max_x/2, "PLAY" );
-		mvwprintw(wndw, 3*max_y/6,max_x/2, "INFO" );
-		mvwprintw(wndw, 4*max_y/6,max_x/2, "QUIT" );
-		mvwprintw(wndw,cursor*max_y/6,max_x/2 -3,">");
+		mvwprintw(wndw,max_y/6,max_x/4, "GENERIC TERMINAL SHOOTING GAME TO WASTE ");
+		mvwprintw(wndw,max_y/6+1,max_x/4, "TIME ON INSTEAD OF BEING PRODUCTIVE AND");
+		mvwprintw(wndw,max_y/6+2,max_x/4, "GETTING ON WITH YOUR WORK");
+		mvwprintw(wndw, 2*max_y/6,7*max_x/16, "PLAY" );
+		mvwprintw(wndw, 3*max_y/6,7*max_x/16, "INFO" );
+		mvwprintw(wndw,4*max_y/6,7*max_x/16, "SCORES");
+		mvwprintw(wndw, 5*max_y/6,7*max_x/16, "QUIT" );		
+		mvwprintw(wndw,cursor*max_y/6,7*max_x/16 -3,">");
 		wrefresh(wndw);
 	}
+	//ERROR
+	return -1;
+}
+
+
+
+static int game_info(int level,int score){
+
+	initscr();
+	cbreak();
+	noecho();
+	curs_set(FALSE);
+	WINDOW * wndw=stdscr;
+	keypad(wndw,TRUE);
+	halfdelay(1);
+
+	//max x and y coordinates to deal with initial positioning
+	int max_x=0;
+	int max_y=0;
+	getmaxyx(wndw,max_y,max_x);
+
+	wchar_t key;
+
+	for(;;){
+
+		if((key=getch())!=ERR){
+			switch(key){
+				//ASCII code for key b
+				case 98:
+					return MENU;
+
+			}
+
+		}
+
+		wclear(wndw);
+		mvwprintw(wndw, 2*max_y/6,max_x/3, "You are on level %i",level );
+		mvwprintw(wndw, 3*max_y/6,max_x/3, "Your current score is %i",score );
+		mvwprintw(wndw, 4*max_y/6,max_x/3, " Instructions:" );
+		mvwprintw(wndw,4*max_y/6+1,max_x/3, "Press Left or Right arrow keys to move");
+		mvwprintw(wndw,4*max_y/6+2,max_x/3, "Press Up arrow key to shoot");
+		mvwprintw(wndw,4*max_y/6+3,max_x/3, "Press b to go back to main menu");
+		wrefresh(wndw);
+
+	}
+	//ERROR
+	return -1;
 }
 
 
