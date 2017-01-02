@@ -1,10 +1,9 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ncurses.h>
 #include <curses.h>
 #include <math.h>
-#include <time.h>
+#include <stdio.h>
 #include "bullet.c"
 #include "player.c"
 #include "display.c"
@@ -14,12 +13,14 @@
 #define PLAY 1
 #define INFO 2
 #define SCORE 3
+#define SAVE 4
 #define TIMEOUT_DELAY 100
 
 //different game mode functions that change display to terminal
 static int playmode(int * level, int * score);
 static int main_menu();
 static int game_info(int level, int score);
+static int save_mode(int * level, int * score);
 
 
 int main () 
@@ -29,7 +30,6 @@ int main ()
 int mode=MENU;
 int level = 1;
 int score = 0;
-
 
 //Main for loop for switching between main menu, and play mode
 for(;;){
@@ -44,7 +44,11 @@ for(;;){
 
 		case INFO:
 			mode = game_info(level,score); 
+			break;
 
+		case SAVE:
+			mode = save_mode(&level,&score);
+			break;
 		}
 	}
 	//ERROR
@@ -251,6 +255,11 @@ static int playmode(int * level,int * score){
 		//if enemies are shot 
 		*score+=100*is_enemy_shot(players,num_enemies,num_friendlies);
 
+		//If main player is shot then go to the save screen
+		if (did_bullet_hit(&player_1,players,num_enemies+num_friendlies)) 
+			{
+				return SAVE;
+			}
 
 
 		//DISPLAY updated positions of a players, enemies and bullets
@@ -368,35 +377,84 @@ static int game_info(int level,int score){
 
 	wchar_t key;
 
-	for(;;){
+	for(;;)
+		{
 
-		if((key=getch())!=ERR){
-			switch(key){
-				//ASCII code for key b
-				case 98:
-					return MENU;
+			if((key=getch())!=ERR)
+				{
+					switch(key){
+						//ASCII code for key b
+						case 98:
+							return MENU;
 
-			}
+					}
+
+				}
+
+			wclear(wndw);
+			mvwprintw(wndw, 2*max_y/6,max_x/3, "You are on level %i",level );
+			mvwprintw(wndw, 3*max_y/6,max_x/3, "Your current score is %i",score );
+			mvwprintw(wndw, 4*max_y/6,max_x/3, " Instructions:" );
+			mvwprintw(wndw,4*max_y/6+1,max_x/3, "Press Left or Right arrow keys to move");
+			mvwprintw(wndw,4*max_y/6+2,max_x/3, "Press Up arrow key to shoot");
+			mvwprintw(wndw,4*max_y/6+3,max_x/3, "Press b to go back to main menu");
+			wrefresh(wndw);
 
 		}
-
-		wclear(wndw);
-		mvwprintw(wndw, 2*max_y/6,max_x/3, "You are on level %i",level );
-		mvwprintw(wndw, 3*max_y/6,max_x/3, "Your current score is %i",score );
-		mvwprintw(wndw, 4*max_y/6,max_x/3, " Instructions:" );
-		mvwprintw(wndw,4*max_y/6+1,max_x/3, "Press Left or Right arrow keys to move");
-		mvwprintw(wndw,4*max_y/6+2,max_x/3, "Press Up arrow key to shoot");
-		mvwprintw(wndw,4*max_y/6+3,max_x/3, "Press b to go back to main menu");
-		wrefresh(wndw);
-
-	}
 	//ERROR
 	return -1;
 }
 
-//Temporary function for moving enemies. This will be replaced later with functions from state.c
-void move_enemy() {
+static int save_mode(int * level, int * score) {
+	initscr();
+	cbreak();
+	noecho();
+	curs_set(FALSE);
+	WINDOW * wndw=stdscr;
+	keypad(wndw,TRUE);
+	halfdelay(1);
 
+	//max x and y coordinates to deal with initial positioning
+	int max_x=0;
+	int max_y=0;
+	getmaxyx(wndw,max_y,max_x);
+
+	FILE *score_file;
+
+	wchar_t key;
+
+	for (;;) 
+		{
+			if((key=getch())!=ERR)
+				{
+					switch(key)
+					{
+						//ASCII code for y
+						case 121:
+							//If the person wants to save their score write it to a file inside the directory
+							score_file = fopen("score_file.txt", "a");
+							fprintf(score_file, "Score: %i   Level:%i\n", *score, *level);
+							fclose(score_file);
+							*level = 1;
+							*score = 0;
+							return MENU;
+						//ASCII code for n
+						case 110:
+							*level = 1;
+							*score = 0;
+							return MENU;
+
+					}
+
+				}
+
+			wclear(wndw);
+			mvwprintw(wndw, 2*max_y/6,max_x/3, "Congratzzz you made it to level %i",*level);
+			mvwprintw(wndw, 3*max_y/6,max_x/3, "Your current score is %i", *score);
+			mvwprintw(wndw, 4*max_y/6,max_x/3, "Would you like to save your current score? (y/n)" );
+			wrefresh(wndw);
+
+		}
 }
 
 
