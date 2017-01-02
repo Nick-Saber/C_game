@@ -151,5 +151,3 @@ int is_enemy_shot(Player ** all_players, int num_enemies,int num_friendlies){
 
 
 
-
-
