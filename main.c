@@ -3,6 +3,8 @@
 #include <string.h>
 #include <ncurses.h>
 #include <curses.h>
+#include <math.h>
+#include <time.h>
 #include "bullet.c"
 #include "player.c"
 #include "display.c"
@@ -28,7 +30,7 @@ for(;;){
 			break;
 
 		case PLAY:
-			mode = playmode(1);
+			mode = playmode(3);
 			break;
 		}
 	}
@@ -53,7 +55,7 @@ static int playmode(int level){
 	//array of all players, first player is always the user
 	int num_enemies=level;
 	int num_friendlies=1;
-	Player ** players[num_friendlies+num_enemies];
+	Player * players[num_friendlies+num_enemies];
 
 
 	//Initializing Player inside of the grid
@@ -68,19 +70,19 @@ static int playmode(int level){
 
 	players[0]=&player_1;
 
-	//Initializing a single enemy inside of the grid
+	//Initializing num_enemy enemies inside of the grid
 	for(int i =0; i<level;i++){
-	Player * enemy = malloc(sizeof(Player));
+		Player * enemy = malloc(sizeof(Player));
 
-	enemy->x_pos=i*(max_x/8);
-	enemy->y_pos=floor(i/4);
-	enemy->character="V";
-	enemy->friendly=FALSE;
-	enemy->ammo_size=5;
-	enemy->alive=TRUE;
-	init_ammo(enemy->ammo_size,enemy);
+		enemy->x_pos=i*(max_x/8);
+		enemy->y_pos=floor(i/4);
+		enemy->character="V";
+		enemy->friendly=FALSE;
+		enemy->ammo_size=5;
+		enemy->alive=TRUE;
+		init_ammo(enemy->ammo_size,enemy);
 
-	players[num_friendlies + i]=enemy;
+		players[num_friendlies + i]=enemy;
 	}
 
 
@@ -136,25 +138,57 @@ static int playmode(int level){
 		update_bullets(players[j],max_y,max_x);
 		}	
 
+		//Go through all the enemies, compute their next action and update their current positions
+		for (int i = 1; i < num_enemies + num_friendlies; i++) 
+			{
+				srand(time(NULL));
+				int move = (rand() % 5) + 1;//compute_action(i, players, num_friendlies+num_enemies, max_y,max_x);
+				switch(move) 
+					{
+						case 1:
+							if (players[i]->y_pos-1 < 2)
+								{
+									i--;
+									break;
+								}
+							players[i]->y_pos-=1;
+							break;
+						case 2:
+							if (players[i]->y_pos+1 > max_y/2)
+								{
+									i--;
+									break;
+								}
+							players[i]->y_pos+=1;
+							break;
+						case 3:
+							if (players[i]->x_pos+1 > max_x-2)
+								{
+									i--;
+									break;
+								}
+							players[i]->x_pos+=1;
+							break;
+						case 4:
+							if (players[i]->x_pos-1 < 2)
+								{
+									i--;
+									break;
+								}
+							players[i]->x_pos-=1;
+							break;
+						case 5:
+							shoot(players[i]);
+							break;
+					}
+			}
+
+
 		//make dead is called before is_enemy_shot so that
 		// when an enemy gets hit an X is displayed and
 		//then on the next iteration of the for loop
 		//the enemies alive member will be switched to false
 		//this is so that display_players will display the X
-
-
-		//This is used to test the first function within the state.c file,
-		/*
-		int avg_MHD_bullets;
-		for (int i = 0; i<2;i++)
-			{
-				avg_MHD_bullets = compute_MHD_bullets(i, players, 2);
-			}
-		*/
-	
-
-		//this is also for testing state.c
-		//mvprintw(max_y-3,5,"avg MHD %i", avg_MHD_bullets);
 
 		//go through all enemies to check if they've already been shot if so make them dead
 		make_dead(players+num_friendlies,num_enemies);
