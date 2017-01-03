@@ -259,14 +259,10 @@ static int playmode(int * level,int * score){
 		*score+=100*is_enemy_shot(players,num_enemies,num_friendlies);
 
 		//If main player is shot then go to the save screen
-		if (did_bullet_hit(&player_1,players,num_enemies+num_friendlies)) 
+		if (did_bullet_hit(player_1,players,num_enemies+num_friendlies)) 
 			{
 				return SAVE;
 			}
-
-
-
-
 
 
 		//DISPLAY updated positions of a players, enemies and bullets
