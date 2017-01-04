@@ -21,6 +21,7 @@ static int playmode(int * level, int * score);
 static int main_menu();
 static int game_info(int level, int score);
 static int save_mode(int * level, int * score);
+static int show_scores();
 
 
 int main () 
@@ -44,6 +45,10 @@ for(;;){
 
 		case INFO:
 			mode = game_info(level,score); 
+			break;
+
+		case SCORE:
+			mode = show_scores();
 			break;
 
 		case SAVE:
@@ -334,8 +339,7 @@ static int main_menu(){
 						case 3:
 							return INFO;
 						case 4:
-							break;
-							//return SCORES;
+							return SCORE;
 						case 5:
 							wclear(wndw);
 							delwin(wndw);
@@ -420,7 +424,7 @@ static int save_mode(int * level, int * score) {
 	//max x and y coordinates to deal with initial positioning
 	int max_x=0;
 	int max_y=0;
-	getmaxyx(wndw,max_y,max_x);
+	
 
 	FILE *score_file;
 
@@ -428,6 +432,8 @@ static int save_mode(int * level, int * score) {
 
 	for (;;) 
 		{
+			getmaxyx(wndw,max_y,max_x);
+
 			if((key=getch())!=ERR)
 				{
 					switch(key)
@@ -454,10 +460,65 @@ static int save_mode(int * level, int * score) {
 			wclear(wndw);
 			mvwprintw(wndw, 2*max_y/6,max_x/3, "Congratzzz you made it to level %i",*level);
 			mvwprintw(wndw, 3*max_y/6,max_x/3, "Your current score is %i", *score);
-			mvwprintw(wndw, 4*max_y/6,max_x/3, "Would you like to save your current score? (y/n)" );
+			mvwprintw(wndw, 4*max_y/6,max_x/5, "Would you like to save your current score? (y/n)" );
 			wrefresh(wndw);
 
 		}
+}
+
+static int show_scores() {
+	//Loading score file
+	FILE * score_file;
+	score_file = fopen("score_file.txt", "r");
+
+	initscr();
+	cbreak();
+	noecho();
+	curs_set(FALSE);
+	WINDOW * wndw=stdscr;
+	keypad(wndw,TRUE);
+	halfdelay(1);
+
+
+	//max x and y coordinates to deal with initial positioning
+	int max_x=0;
+	int max_y=0;
+	getmaxyx(wndw,max_y,max_x);
+
+	wclear(wndw);
+
+		
+		
+	char buff[255];
+	//Printing scoreboard
+	mvwprintw(wndw, 2*max_y/12,max_x/3, "Last Three Scores:");
+	//Printing last three scores onto scorboard
+	for (int i = 1;i<4;i++) 
+		{
+			fgets(buff, 255, score_file);
+			mvwprintw(wndw, 2*max_y/12 + i,max_x/3, "%s", buff);
+		}
+
+	mvwprintw(wndw, 2*max_y/12 + 15,max_x/4, "Press (b) to go back to the Main Menu");
+	wrefresh(wndw);
+
+	wchar_t key;
+
+	for (;;) 
+		{
+		
+			if((key=getch())!=ERR)
+				{
+					switch(key)
+					{
+						//ASCII code for b
+						case 98:
+							return MENU;
+					}
+				}
+		}
+
+
 }
 
 
