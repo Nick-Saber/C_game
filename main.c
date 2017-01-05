@@ -197,52 +197,12 @@ static int playmode(int * level,int * score){
 			}
 		}
 
-
+		//Computes and performs the actions of all the enemies
+		for (int i = 1; i < num_friendlies + num_enemies; i++)
+		{
+			perform_action(players[i], compute_action(players[i], p_max_y, p_max_x));
+		}
 		
-
-		//Go through all the enemies, compute their next action and update their current positions
-		for (int i = 1; i < num_enemies + num_friendlies; i++) 
-			{
-				int move = (rand() % 5) + 1;//compute_action(i, players, num_friendlies+num_enemies, max_y,max_x);
-				switch(move) 
-					{
-						case 1:
-							if (players[i]->y_pos-1 < 2)
-								{
-									i--;
-									break;
-								}
-							players[i]->y_pos-=1;
-							break;
-						case 2:
-							if (players[i]->y_pos+1 > p_max_y/2)
-								{
-									i--;
-									break;
-								}
-							players[i]->y_pos+=1;
-							break;
-						case 3:
-							if (players[i]->x_pos+1 > p_max_x-2)
-								{
-									i--;
-									break;
-								}
-							players[i]->x_pos+=1;
-							break;
-						case 4:
-							if (players[i]->x_pos-1 < 2)
-								{
-									i--;
-									break;
-								}
-							players[i]->x_pos-=1;
-							break;
-						case 5:
-							shoot(players[i]);
-							break;
-					}
-			}
 
 		//update bullets for all characters
 		for(int j =0;j<num_friendlies+num_enemies;j++){
@@ -597,6 +557,6 @@ static int show_scores() {
 
 
 	}
+	return -1;
 }
-
 

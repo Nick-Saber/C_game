@@ -1,6 +1,11 @@
+//******************FUNCTIONALITY NOT IMPLEMENTED THUS FAR*******************//
+
+
 //Struct used for checking the state of the current game for a specific player or enemy
+
 //MHD = Manhattan distance
-struct State {
+/*struct State {
+>>>>>>> b2a3ae5a5dd7b3eebcf045349feadf3026249e3d
 	int min_MHD_bullet;
 	int min_MHD_player;
 
@@ -157,7 +162,7 @@ int compute_action(int playr_index, Player ** playrs, int no_of_players, int max
 			
 			//Making sure that the enemy doesn't move out of the screen or within two spaces of another enemy
 			//and not below halfway down the screen.
-}
+}*/
 
 
 

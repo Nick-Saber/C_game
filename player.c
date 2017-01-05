@@ -161,6 +161,123 @@ void delete_players(Player ** plyrs, int size){
 	free(plyrs);
 }
 
+//Returns an integer that represents an action for the player to take
+int compute_action(Player * enemy, int max_y, int max_x) {
+
+	
+	//Iterate through the actions and determine which action is appropriate to take based on the enemies position
+	for (;;) 
+	{
+		int move = (rand() % 5) + 1;
+		switch(move) 
+		{
+			//Move Up
+			case 1:
+				if (enemy->y_pos-1 > 2) 
+				{
+					return move;
+				}
+				break;
+
+			//Move Down
+			case 2:
+				if (enemy->y_pos+1 < max_y/2) 
+					{
+						return move;
+					}
+				break;
+
+			//Move Right
+			case 3:
+				if (enemy->x_pos+1 < max_x-1)
+					{
+						return move;
+					}
+				break;
+			//Move Left
+			case 4:
+				if (enemy->x_pos-1 > 2) 
+					{
+						return move;
+					}
+				break;
+			//Shoot
+			case 5:
+				return move;
+				break;
+		}
+	}
+	
+
+
+
+
+
+	/*Go through all the enemies, compute their next action and update their current positions
+		for (int i = 1; i < num_enemies + num_friendlies; i++) 
+			{
+				int move = (rand() % 5) + 1;//compute_action(i, players, num_friendlies+num_enemies, max_y,max_x);
+				switch(move) 
+					{
+						case 1:
+							if (players[i]->y_pos-1 < 2)
+								{
+									i--;
+									break;
+								}
+							players[i]->y_pos-=1;
+							break;
+						case 2:
+							if (players[i]->y_pos+1 > p_max_y/2)
+								{
+									i--;
+									break;
+								}
+							players[i]->y_pos+=1;
+							break;
+						case 3:
+							if (players[i]->x_pos+1 > p_max_x-2)
+								{
+									i--;
+									break;
+								}
+							players[i]->x_pos+=1;
+							break;
+						case 4:
+							if (players[i]->x_pos-1 < 2)
+								{
+									i--;
+									break;
+								}
+							players[i]->x_pos-=1;
+							break;
+						case 5:
+							shoot(players[i]);
+							break;
+					}
+			}*/
+}
+
+void perform_action(Player * enemy, int move) {
+	switch(move) {
+		case 1: 
+			enemy->y_pos-=1;
+			break;
+		case 2:
+			enemy->y_pos+=1;
+			break;
+		case 3:
+			enemy->x_pos+=1;
+			break;
+		case 4: 
+			enemy->x_pos-=1;
+			break;
+		case 5:
+			shoot(enemy);
+			break;
+	}
+} 
+
 
 
 
