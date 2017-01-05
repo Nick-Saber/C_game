@@ -1,5 +1,5 @@
 //Struct used for checking the state of the current game for a specific player or enemy
-//MHD = Manhatton distance
+//MHD = Manhattan distance
 struct State {
 	int min_MHD_bullet;
 	int min_MHD_player;
