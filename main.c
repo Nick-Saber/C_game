@@ -426,5 +426,7 @@ static int save_mode(int * level, int * score) {
 		}
 }
 
-
+static int show_scores() {
+	return 0;
+}
 
