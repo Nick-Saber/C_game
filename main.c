@@ -191,52 +191,12 @@ static int playmode(int * level,int * score){
 			}
 		}
 
-
+		//Computes and performs the actions of all the enemies
+		for (int i = 1; i < num_friendlies + num_enemies; i++)
+		{
+			perform_action(players[i], compute_action(players[i], p_max_y, p_max_x));
+		}
 		
-
-		//Go through all the enemies, compute their next action and update their current positions
-		for (int i = 1; i < num_enemies + num_friendlies; i++) 
-			{
-				int move = (rand() % 5) + 1;//compute_action(i, players, num_friendlies+num_enemies, max_y,max_x);
-				switch(move) 
-					{
-						case 1:
-							if (players[i]->y_pos-1 < 2)
-								{
-									i--;
-									break;
-								}
-							players[i]->y_pos-=1;
-							break;
-						case 2:
-							if (players[i]->y_pos+1 > p_max_y/2)
-								{
-									i--;
-									break;
-								}
-							players[i]->y_pos+=1;
-							break;
-						case 3:
-							if (players[i]->x_pos+1 > p_max_x-2)
-								{
-									i--;
-									break;
-								}
-							players[i]->x_pos+=1;
-							break;
-						case 4:
-							if (players[i]->x_pos-1 < 2)
-								{
-									i--;
-									break;
-								}
-							players[i]->x_pos-=1;
-							break;
-						case 5:
-							shoot(players[i]);
-							break;
-					}
-			}
 
 		//update bullets for all characters
 		for(int j =0;j<num_friendlies+num_enemies;j++){
@@ -466,59 +426,5 @@ static int save_mode(int * level, int * score) {
 		}
 }
 
-static int show_scores() {
-	//Loading score file
-	FILE * score_file;
-	score_file = fopen("score_file.txt", "r");
-
-	initscr();
-	cbreak();
-	noecho();
-	curs_set(FALSE);
-	WINDOW * wndw=stdscr;
-	keypad(wndw,TRUE);
-	halfdelay(1);
-
-
-	//max x and y coordinates to deal with initial positioning
-	int max_x=0;
-	int max_y=0;
-	getmaxyx(wndw,max_y,max_x);
-
-	wclear(wndw);
-
-		
-		
-	char buff[255];
-	//Printing scoreboard
-	mvwprintw(wndw, 2*max_y/12,max_x/3, "Last Three Scores:");
-	//Printing last three scores onto scorboard
-	for (int i = 1;i<4;i++) 
-		{
-			fgets(buff, 255, score_file);
-			mvwprintw(wndw, 2*max_y/12 + i,max_x/3, "%s", buff);
-		}
-
-	mvwprintw(wndw, 2*max_y/12 + 15,max_x/4, "Press (b) to go back to the Main Menu");
-	wrefresh(wndw);
-
-	wchar_t key;
-
-	for (;;) 
-		{
-		
-			if((key=getch())!=ERR)
-				{
-					switch(key)
-					{
-						//ASCII code for b
-						case 98:
-							return MENU;
-					}
-				}
-		}
-
-
-}
 
 
