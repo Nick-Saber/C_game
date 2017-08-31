@@ -8,6 +8,7 @@
 #include "player.c"
 #include "display.c"
 #include "state.c"
+#include "score_io.c"
 
 #define MENU 0
 #define PLAY 1
@@ -73,7 +74,7 @@ static int playmode(int * level,int * score){
 	initscr();
 	cbreak();
 	noecho();
-	curs_set(FALSE);
+	curs_set(0);
 	int past_scr_x;
 	int past_scr_y;
 	getmaxyx(stdscr,past_scr_y,past_scr_x);
@@ -227,7 +228,7 @@ static int playmode(int * level,int * score){
 
 
 		//if enemies are shot 
-		*score+=100*is_enemy_shot(players,num_enemies,num_friendlies);
+		*score+=10*is_enemy_shot(players,num_enemies,num_friendlies);
 
 		//If main player is shot then go to the save screen
 		if (did_bullet_hit(player_1,players,num_enemies+num_friendlies)) 
@@ -256,7 +257,7 @@ static int main_menu(){
 	initscr();
 	cbreak();
 	noecho();
-	curs_set(FALSE);
+	curs_set(0);
 	WINDOW * wndw=stdscr;
 	keypad(wndw,TRUE);
 	halfdelay(1);
@@ -429,17 +430,21 @@ static int save_mode(int * level, int * score) {
 
 static int enter_name(int * level, int * score){
 	initscr();
-	nocbreak();
+	cbreak();
 	noecho();
 	curs_set(TRUE);
 	WINDOW * wndw=stdscr;
+	//allows non-blocking input for getting characters
 	nodelay(wndw,TRUE);
-	
+	//doesn't move the cursors location on refreshes
 	wchar_t key;
+	int read_limit=40;
+	char input_buffer[read_limit];
+	int keys_read =0;
 
 
 	//max x and y coordinates to deal with screen resizing
-	int max_x=0;
+	int max_x=0;	
 	int max_y=0;
 
 
@@ -447,39 +452,130 @@ static int enter_name(int * level, int * score){
 	for(;;){
 	getmaxyx(wndw,max_y,max_x);
 
-		if((key = getch()) != ERR){
-			FILE * score_file = fopen("score_file.txt", "w+");
-			int lines = 0;
-			//count number of lines in score_file
-			for(int temp=fgetc(score_file);temp != EOF;){if(temp=="\n"){lines++;}}
-			//reset score_file to beginning of file
-			fseek(score_file, 0, SEEK_SET);
-			if(lines ==0){
-				fprintf(score_file, "%c Score: %i   Level:%i\n",key, *score, *level);
-				fclose(score_file);
+		if((key = wgetch(wndw)) != ERR)
+		{		//10 is ASCII value for the enter key
+				// since KEY_ENTER is only for nurmeric keypad enter in ncurses
+			if((key == 10 )|| (keys_read ==read_limit-1))
+			{
+				input_buffer[keys_read]='\0';
+				FILE * score_file = fopen("score_file.txt", "r");
 
+				if(score_file==NULL)
+					{
+						score_file = fopen("score_file.txt","w+");
+						fprintf(score_file, "%s Level:%i Score: %i\n",input_buffer, *level, *score);
+					} 
+				else
+					{
+						//read in line by line the scores file in order to edit the lines of the file
+						int lines = number_of_lines(score_file);
+						char score_file_lines[lines][400];
+						for(int i = 0; i< lines;i++)
+						{
+							fgets(score_file_lines[i],400,score_file);
+						}
+
+						//order the lines by score while storing original ordering in the second index.
+						int score_value[lines][2];
+						for(int i =0; i <lines; i ++)
+						{
+							score_value[i][0]=get_score(score_file_lines[i]);
+							score_value[i][1]=i;
+						}
+						qsort(&score_value,sizeof(int)*2,lines,integer_comparison);
+
+
+						//write lines into score_file.txt, there are never more than 10 entries in score_file.txt
+						//variable to keep track
+						int lines_written = 0;
+						//close file to end reading and reopen with "w" option to overwrite previous contents of the file
+						fclose(score_file);
+						score_file=fopen("score_file.txt","w");
+
+						//set the position_of_new_entry to be the position of the lowest upper bound score
+						//of all the scores in score_value
+						int position_of_new_entry=0;
+						for(int i =lines-1;i>=0;i--)
+						{
+							if(score_value[i][0]>= *score)
+							{
+								position_of_new_entry=i;
+							}
+						}
+
+
+						//re-write all scores that are bigger than the newest score to score_file
+						for(int i = lines-1;i>=position_of_new_entry && lines_written<10;i--)
+						{
+							//find the original character line to rewrite corresponding to the value of
+							//score_value[i][0]
+
+							for(int j = 0;j<lines;j++)
+							{	
+								if(score_value[i][0]==get_score(score_file_lines[j]) && score_value[i][1]==j)
+								{
+									fprintf(score_file, score_file_lines[j]);
+									lines_written++;
+									break;
+								}
+							}
+						}
+						//write the current score if there's space
+						if(lines_written <10)
+						{
+							fprintf(score_file, "%s Level:%i Score:%i\n",input_buffer, *level, *score);
+							lines_written++;
+						}
+
+						//write the rest of the scores lower than current score if they exist
+						if(position_of_new_entry>0)
+						{
+							for(int i = position_of_new_entry-1;lines_written<10 && lines_written<lines+1;i--)
+							{
+								//find the original character line to rewrite corresponding to the value of
+								//score_value[i][0]
+								for(int j = 0;j<lines;j++)
+								{
+									if((score_value[i][0]==get_score(score_file_lines[j]) && score_value[i][1]==j))
+									{
+										fprintf(score_file, score_file_lines[j]);
+										lines_written++;
+										break;
+									}
+								}
+
+							}
+						} else {
+							
+						}
+
+
+					}
+
+			 	fclose(score_file);
+				*level = 1;
+				*score = 0;
 				return MENU;
+			} 
+			else
+			{
+				input_buffer[keys_read]=key;
+				keys_read++;
 			}
-
-
-
-			*level = 1;
-			*score = 0;
-			fclose(score_file);
-			return MENU;
 		}
-
-
 
 		wclear(wndw);
 
 		mvwprintw(wndw,max_y/3,max_x/3,"ENTER YOUR NAME");
-		wmove(wndw, 3+max_y/3,max_x/3);
+		wmove(wndw, (max_y/3 + 3),max_x/3);
+
 
 		wrefresh(wndw);
 
 	}
 
+
+	//ERROR if for loop breaks
 	return -1;
 
 }
@@ -509,11 +605,25 @@ static int show_scores() {
 
 		
 	wchar_t key;
-	char buff[255];
 
-	//Loading score file
+
+
+	//Loading score file information
 	FILE * score_file;
 	score_file = fopen("score_file.txt", "r");
+	char buff[10][255];
+	int lines; 
+	bool exist_scores;
+	if(score_file){
+	exist_scores=TRUE;
+	for(int i=1; fgets(buff[i-1],255,score_file)!=NULL;i++){
+			lines=i;
+		}
+	}else{
+		exist_scores=FALSE;
+	}
+
+
 
 	//Displaying scoreboard
 	for(;;){
@@ -537,15 +647,13 @@ static int show_scores() {
 
 	wclear(wndw);
 
-	if(score_file){
+	if(exist_scores){
 		mvwprintw(wndw, 2*max_y/12,max_x/3, "Top 10 Scores:");
 		//Printing last three scores onto scorboard
-		for (int i = 1;i<4;i++) 
+		for (int i =0;i<lines; i++) 
 			{
-				fgets(buff, 255, score_file);
-				mvwprintw(wndw, 2*max_y/12 + i,max_x/3, "%s", buff);
+				mvwprintw(wndw, 2*max_y/12 + (i+1),max_x/3, "%s", buff[i]);
 			}
-
 		mvwprintw(wndw, 2*max_y/12 + 15,max_x/4, "Press (b) to go back to the Main Menu");
 	} else{
 		mvwprintw(wndw,2*max_y/12,max_x/6, "No scores made yet, go out there and make some history¡");

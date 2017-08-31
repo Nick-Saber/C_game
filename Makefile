@@ -2,6 +2,9 @@
 
 
 all:
-	gcc -g -o game -lncurses main.c 
+	gcc -o game -lncurses main.c 
 	./game 
 
+
+:main.c
+	touch fds.c
